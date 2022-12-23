@@ -8,23 +8,18 @@ router.get('/users/get', (req, res) => {
 })
 
 //add a new user to the database
-router.post('/users/add', (req, res) =>{
+router.post('/users/add', async (req, res) => {
     if(Object.keys(req.body) === 0){
         res.status(400).send("na data input").end();
     }
     else{
-        const userName = req.body.username 
         const password = req.body.password
-        const email = req.body.email    
+        const email = req.body.email  
 
-        const data = {
-            "username": userName,
-            "password": password,
-            "email": email
-        }
+        const user = await firebaseApp.addUser(email, password)
 
         //more validations
-        res.status(200).send(data).end()
+        res.status(200).send(user).end()
     }
 })
 

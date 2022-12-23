@@ -1,10 +1,12 @@
 //firebase
-const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
 const { getFirestore, Timestamp, FieldValue } = require('firebase-admin/firestore');
+const { getAuth, onAuthStateChanged, createUserWithEmailAndPassword } = require('firebase/auth')
+
+const admin = require('firebase-admin')
 require('dotenv').config();
 
-const firebaseApp = initializeApp({
-  credential: cert({
+admin.initializeApp({
+  credential: admin.credential.cert({
     "type": process.env.TYPE,
     "project_id": process.env.PROJECT_ID,
     "private_key_id": process.env.PRIVATE_KEY_ID,
@@ -17,6 +19,7 @@ const firebaseApp = initializeApp({
     "client_x509_cert_url": process.env.CLIENT_X509_CERT_URL
   })
 });
+
 
 const db = getFirestore()
 
@@ -94,10 +97,38 @@ async function deleteScore(name, score, wpm){
   }
 }
 
+
+//#### USERS ####//
+
+async function addUser(email, password) { 
+  const userResponse = await admin.auth().createUser({
+    email: email,
+    password: password,
+    emailVerified: false,
+    disabled: false
+  }).catch((error) => {
+    return error
+  })
+  
+  return userResponse
+  
+
+  // createUserWithEmailAndPassword(auth, email, password)
+  // .then((userCredential) => {
+  //   //sign in
+  //   return userCredential
+  // })
+  // .catch((error) => {
+  //    return error
+  // })
+}
+
+
 module.exports = {
     getAllWords,
     addWords,
     deleteWord,
     getAllScores,
-    addScore
+    addScore,
+    addUser
 }
